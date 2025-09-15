@@ -7,7 +7,7 @@ import { PokemonService } from '@/pokemon/PokemonService';
 import { AppModule } from '@/AppModule';
 import { RedisKey } from '@/enums';
 
-describe('PokemonService Sync', () => {
+describe('PokemonService getItems', () => {
   let pokemonService: PokemonService;
   let pokemonRepo: Repository<PokemonEntity>;
   let cache: Cache;
@@ -22,14 +22,30 @@ describe('PokemonService Sync', () => {
     cache = module.get('CACHE_MANAGER');
   });
 
-  it('Should sync real Pokémon data and store in DB & cache', async () => {
+  it('Should get real Pokémon data from DB', async () => {
     await pokemonService.sync();
 
-    const count = await pokemonRepo.count();
-    expect(count).toBeGreaterThan(0);
+    const items = await pokemonService.getItems();
+
+    expect(items.length).toBeGreaterThan(0);
 
     const cached = await cache.get(RedisKey.POKEMON_LIST);
-    expect(cached).toBeUndefined();
+
+    expect(cached).toBeDefined();
+    expect((cached as unknown[]).length).toBe(items.length);
+  });
+
+  it('Should get real Pokémon data from Cache', async () => {
+    await pokemonRepo.clear();
+
+    const items = await pokemonService.getItems();
+
+    expect(items.length).toBeGreaterThan(0);
+
+    const cached = await cache.get(RedisKey.POKEMON_LIST);
+
+    expect(cached).toBeDefined();
+    expect((cached as unknown[]).length).toBe(items.length);
   });
 
   afterAll(async () => {

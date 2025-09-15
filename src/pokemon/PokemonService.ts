@@ -6,6 +6,7 @@ import { Inject } from '@nestjs/common';
 import { PokemonEntity } from './entities/PokemonEntity';
 import { PokemonClientService } from './PokemonClientService';
 import { RedisKey } from '@/enums';
+import { IPokemonDetailResponse } from './interfaces';
 
 @Injectable()
 export class PokemonService {
@@ -38,9 +39,27 @@ export class PokemonService {
       );
 
       await this.cacheManager.del(RedisKey.POKEMON_LIST);
+
+      Logger.log('Pokémon data synced successfully');
     } catch (error) {
       Logger.error('Error syncing Pokémon data', error);
       throw new Error('Failed to sync Pokémon data');
+    }
+  }
+
+  async getItems(): Promise<IPokemonDetailResponse[]> {
+    try {
+      const cachedData = await this.cacheManager.get<IPokemonDetailResponse[]>(RedisKey.POKEMON_LIST);
+
+      if (cachedData) return cachedData;
+
+      const items = await this.pokemonRepo.find();
+      await this.cacheManager.set(RedisKey.POKEMON_LIST, items);
+
+      return items;
+    } catch (error) {
+      Logger.error('Error fetching Pokémon list', error);
+      throw new Error('Failed to fetch Pokémon list');
     }
   }
 }

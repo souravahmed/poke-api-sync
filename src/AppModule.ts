@@ -4,7 +4,7 @@ import { PokemonModule } from './pokemon/PokemonModule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
-import { CACHE_TTL_IN_SECONDS } from './constants';
+import { CACHE_TTL_IN_MS } from './constants';
 
 @Module({
   imports: [
@@ -33,7 +33,7 @@ import { CACHE_TTL_IN_SECONDS } from './constants';
         store: redisStore,
         host: configService.get('REDIS_HOST'),
         port: configService.get('REDIS_PORT'),
-        ttl: CACHE_TTL_IN_SECONDS, // 1 hour cache
+        ttl: CACHE_TTL_IN_MS,
       }),
       inject: [ConfigService],
     }),
