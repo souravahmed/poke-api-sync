@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
 import { CACHE_TTL_IN_MS } from './constants';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CACHE_TTL_IN_MS } from './constants';
       }),
       inject: [ConfigService],
     }),
+    ScheduleModule.forRoot(),
     PokemonModule,
   ],
   controllers: [],

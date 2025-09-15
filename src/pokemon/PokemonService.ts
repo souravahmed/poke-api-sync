@@ -7,6 +7,8 @@ import { PokemonEntity } from './entities/PokemonEntity';
 import { PokemonClientService } from './PokemonClientService';
 import { RedisKey } from '@/enums';
 import { IPokemonDetailResponse } from './interfaces';
+import { Cron } from '@nestjs/schedule';
+import { ExtendedCronExpression } from '@/constants';
 
 @Injectable()
 export class PokemonService {
@@ -61,5 +63,11 @@ export class PokemonService {
       Logger.error('Error fetching Pokémon list', error);
       throw new Error('Failed to fetch Pokémon list');
     }
+  }
+
+  @Cron(ExtendedCronExpression.EVERY_15_MINUTES)
+  async handleCron() {
+    Logger.log('Running scheduled Pokémon sync...');
+    await this.sync();
   }
 }

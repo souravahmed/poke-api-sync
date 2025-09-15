@@ -17,18 +17,23 @@ export class PokemonClientService {
     private readonly http: HttpService,
   ) {
     const baseUrl = this.configService.get<string>('POKEAPI_BASE_URL');
+
     if (!baseUrl) {
       throw new Error('POKEAPI_BASE_URL is not defined in environment variables');
     }
+
     this.baseUrl = baseUrl;
 
-    axiosRetry(this.http.axiosRef, { retries: MAXIMUM_RETRIES, retryDelay: axiosRetry.exponentialDelay });
+    axiosRetry(this.http.axiosRef, {
+      retries: MAXIMUM_RETRIES,
+      retryDelay: axiosRetry.exponentialDelay,
+      retryCondition: (error) => !!error.response && error.response.status >= 500,
+    });
   }
 
   async getPokemonList(limit = DEFAULT_PAGE_LIMIT): Promise<IPaginationResponse> {
     try {
       const response = await firstValueFrom(this.http.get<IPaginationResponse>(`${this.baseUrl}?limit=${limit}`));
-
       return response.data;
     } catch (err) {
       Logger.error(`Error fetching Pokémon list: ${err.message}`);
@@ -41,6 +46,7 @@ export class PokemonClientService {
       const response = await firstValueFrom(this.http.get<IPokemonDetailResponse>(url));
       return response.data;
     } catch (err) {
+      Logger.error(`Error fetching Pokémon details: ${err.message}`);
       throw new Error(`Failed to fetch Pokémon details: ${err.message}`);
     }
   }
