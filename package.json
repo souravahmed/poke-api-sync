@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "create:env": "node -r fs -e \"fs.copyFileSync('.env.example', '.env', fs.constants.COPYFILE_EXCL)\"",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

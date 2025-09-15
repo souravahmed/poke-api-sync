@@ -6,6 +6,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { redisStore } from 'cache-manager-redis-store';
 import { CACHE_TTL_IN_MS } from './constants';
 import { ScheduleModule } from '@nestjs/schedule';
+import { HealthController } from './HealthController';
 
 @Module({
   imports: [
@@ -41,7 +42,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
     PokemonModule,
   ],
-  controllers: [],
+  controllers: [HealthController],
   providers: [],
 })
 export class AppModule {}
